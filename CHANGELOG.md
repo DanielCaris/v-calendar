@@ -1,3 +1,8 @@
+# v0.9.8
+## Bug Fixes
+### `v-calendar`
+* Fix range calendar issue on iPhone
+
 # v0.9.7
 ## Bug Fixes
 ### `v-calendar`

@@ -1,130 +1,95 @@
 <template>
-<popover
-  align='center'
-  transition='fade'
-  class='c-day-popover'
-  :content-offset='popoverContentOffset'
-  :visibility='popoverVisibility'
-  :content-style='popoverContentStyle'
-  :is-interactive='popoverIsInteractive'
-  @got-focus='isFocused = true'
-  @lost-focus='isFocused = false'
-  toggle-visible-on-click>
-  <div
-    class='c-day'
-    :style='dayCellStyle'>
-    <!-- Background layers -->
-    <transition-group
-      name='background'
-      tag='div'
-      class='c-day-backgrounds c-day-layer'>
-      <div
-        v-for='background in backgrounds'
-        :key='background.key'
-        :class='background.wrapperClass'>
+  <popover
+    align="center"
+    transition="fade"
+    class="c-day-popover"
+    :content-offset="popoverContentOffset"
+    :visibility="popoverVisibility"
+    :content-style="popoverContentStyle"
+    :is-interactive="popoverIsInteractive"
+    @got-focus="isFocused = true"
+    @lost-focus="isFocused = false"
+    toggle-visible-on-click
+  >
+    <div class="c-day" :style="dayCellStyle">
+      <!-- Background layers -->
+      <transition-group name="background" tag="div" class="c-day-backgrounds c-day-layer">
         <div
-          class='c-day-background'
-          :style='background.style'>
+          v-for="background in backgrounds"
+          :key="background.key"
+          :class="background.wrapperClass"
+        >
+          <div class="c-day-background" :style="background.style"></div>
         </div>
-      </div>
-    </transition-group>
-    <!-- Content layer -->
-    <div
-      class='c-day-content-wrapper'
-      @click='click'
-      @mouseenter='mouseenter'
-      @mouseover='mouseover'
-      @mouseleave='mouseleave'>
-      <slot
-        name='day-content' 
-        :day='day'
-        :content-style='contentStyle'
-        :attributes='attributesList'>
-        <div
-          class='c-day-content'
-          :style='contentStyle'>
-          <div>
-            {{ day.label }}
+      </transition-group>
+      <!-- Content layer -->
+      <div
+        class="c-day-content-wrapper"
+        @click="click"
+        @mouseenter="mouseenter"
+        @mouseover="mouseover"
+        @mouseleave="mouseleave"
+      >
+        <slot
+          name="day-content"
+          :day="day"
+          :content-style="contentStyle"
+          :attributes="attributesList"
+        >
+          <div class="c-day-content" :style="contentStyle">
+            <div>{{ day.label }}</div>
           </div>
+        </slot>
+      </div>
+      <!-- Dots layer -->
+      <div class="c-day-layer c-day-box-center-bottom" v-if="hasDots">
+        <div class="c-day-dots" :style="dotsStyle">
+          <span v-for="dot in dots" :key="dot.key" class="c-day-dot" :style="dot.style"></span>
         </div>
-      </slot>
-    </div>
-    <!-- Dots layer -->
-    <div
-      class='c-day-layer c-day-box-center-bottom'
-      v-if='hasDots'>
-      <div
-        class='c-day-dots'
-        :style='dotsStyle'>
-        <span
-          v-for='dot in dots'
-          :key='dot.key'
-          class='c-day-dot'
-          :style='dot.style'>
-        </span>
+      </div>
+      <!-- Bars layer -->
+      <div class="c-day-layer c-day-box-center-bottom" v-if="hasBars">
+        <div class="c-day-bars" :style="barsStyle">
+          <span v-for="bar in bars" :key="bar.key" class="c-day-bar" :style="bar.style"></span>
+        </div>
       </div>
     </div>
-    <!-- Bars layer -->
-    <div
-      class='c-day-layer c-day-box-center-bottom'
-      v-if='hasBars'>
-      <div
-        class='c-day-bars'
-        :style='barsStyle'>
-        <span
-          v-for='bar in bars'
-          :key='bar.key'
-          class='c-day-bar'
-          :style='bar.style'>
-        </span>
-      </div>
+    <!-- Popover content -->
+    <div class="c-day-popover-content" slot="popover-content">
+      <!-- Day popover header slot -->
+      <slot name="day-popover-header" :day="day" :attributes="attributesList"></slot>
+      <!-- Content row slots -->
+      <calendar-day-popover-row
+        v-for="popover in popovers"
+        :key="popover.key"
+        :attribute="popover.attribute"
+        :hide-indicator="popover.hideIndicator"
+      >
+        <slot
+          :name="popover.slot"
+          :attribute="popover.attribute"
+          :custom-data="popover.attribute.customData"
+          :day="day"
+        >
+          <span
+            v-if="popover.label"
+            class="popover-label"
+            :style="popover.labelStyle"
+            :key="popover.key"
+          >{{ popover.label }}</span>
+          <component
+            v-if="popover.component"
+            :is="popover.component"
+            :attribute="popover.attribute"
+            :format="formats.dayPopover"
+            :day="day"
+          ></component>
+        </slot>
+      </calendar-day-popover-row>
+      <!-- Day popover footer slot -->
+      <slot name="day-popover-footer" :day="day" :attributes="attributesList"></slot>
     </div>
-  </div>
-  <!-- Popover content -->
-  <div
-    class='c-day-popover-content'
-    slot='popover-content'>
-    <!-- Day popover header slot -->
-    <slot
-      name='day-popover-header'
-      :day='day'
-      :attributes='attributesList'>
-    </slot>
-    <!-- Content row slots -->
-    <calendar-day-popover-row
-      v-for='popover in popovers'
-      :key='popover.key'
-      :attribute='popover.attribute'
-      :hide-indicator='popover.hideIndicator'>
-      <slot
-        :name='popover.slot'
-        :attribute='popover.attribute'
-        :custom-data='popover.attribute.customData'
-        :day='day'>
-        <span
-          v-if='popover.label'
-          class='popover-label'
-          :style='popover.labelStyle'
-          :key='popover.key'>
-          {{ popover.label }}
-        </span>
-        <component
-          v-if='popover.component'
-          :is='popover.component'
-          :attribute='popover.attribute'
-          :format='formats.dayPopover'
-          :day='day'>
-        </component>
-      </slot>
-    </calendar-day-popover-row>
-    <!-- Day popover footer slot -->
-    <slot
-      name='day-popover-footer'
-      :day='day'
-      :attributes='attributesList'>
-    </slot>
-  </div>
-</popover>
+  </popover>
 </template>
 
 <script>
@@ -306,6 +271,10 @@ export default {
     },
     mouseenter(e) {
       this.$emit('daymouseenter', this.getDayEvent(e));
+      const isIPhone = navigator.userAgent.match(/(iPhone OS 11_)/);
+      if (isIPhone) {
+        this.$emit('dayclick', this.getDayEvent(e));
+      }
     },
     mouseover(e) {
       this.isHovered = true;
