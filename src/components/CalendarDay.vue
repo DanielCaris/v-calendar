@@ -306,6 +306,10 @@ export default {
     },
     mouseenter(e) {
       this.$emit('daymouseenter', this.getDayEvent(e));
+      const isIPhone = navigator.userAgent.match(/iP(hone|od|ad)/);
+      if (isIPhone) {
+        this.$emit('dayclick', this.getDayEvent(e));
+      }
     },
     mouseover(e) {
       this.isHovered = true;
